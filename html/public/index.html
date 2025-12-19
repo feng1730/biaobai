@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心动表白墙 & 时光相册</title>
+    <!-- 引入Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        love: {
+                            light: '#FFE6F2',
+                            DEFAULT: '#FF69B4',
+                            dark: '#FF3399',
+                        },
+                        album: {
+                            light: '#E6F7FF',
+                            DEFAULT: '#4096FF',
+                            dark: '#1890FF',
+                        },
+                        neutral: {
+                            100: '#F9FAFB',
+                            200: '#F3F4F6',
+                            300: '#E5E7EB',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .btn-gradient-love {
+                @apply bg-gradient-to-r from-love to-love-dark text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300;
+            }
+            .btn-gradient-album {
+                @apply bg-gradient-to-r from-album to-album-dark text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300;
+            }
+        }
+    </style>
+    <!-- 引入自定义CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body class="font-sans text-gray-800 min-h-screen">
+    <!-- 页面头部 -->
+    <header class="relative overflow-hidden bg-love text-white py-8 px-4 shadow-lg">
+        <div class="absolute inset-0 bg-gradient-to-r from-love to-love-dark opacity-90"></div>
+        <!-- 装饰元素 -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10">
+            <i class="fas fa-heart absolute text-love-dark" style="top: 10%; left: 15%; font-size: 3rem;"></i>
+            <i class="fas fa-heart absolute text-love-dark" style="top: 30%; left: 80%; font-size: 2rem;"></i>
+            <i class="fas fa-heart absolute text-love-dark" style="top: 70%; left: 25%; font-size: 1.5rem;"></i>
+            <i class="fas fa-heart absolute text-love-dark" style="top: 50%; left: 60%; font-size: 2.5rem;"></i>
+        </div>
+        <div class="container mx-auto text-center relative z-10">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-shadow mb-2">❤️ 心动表白墙 & 时光相册 ❤️</h1>
+            <p class="text-love-light text-[clamp(1rem,2vw,1.2rem)] max-w-2xl mx-auto">
+                记录每一份心动，珍藏每一个美好瞬间
+            </p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- 表白墙模块 -->
+        <section class="bg-white rounded-2xl p-6 shadow-md overflow-hidden">
+            <!-- 模块标题栏 -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-love flex items-center">
+                    <i class="fas fa-heart-pulse mr-3 text-love-dark"></i>心动表白墙
+                </h2>
+                <span class="text-sm text-gray-500 bg-love-light px-3 py-1 rounded-full">
+                    已有 <span id="love-count" class="font-semibold text-love-dark">0</span> 份心动
+                </span>
+            </div>
+
+            <!-- 表白内容输入区域 -->
+            <div class="mb-8 bg-neutral-100 rounded-xl p-5 shadow-sm">
+                <input 
+                    type="text" 
+                    id="love-name" 
+                    placeholder="你的名字（可选）" 
+                    class="w-full px-4 py-3 mb-4 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-love/50 focus:border-love transition-all"
+                >
+                <textarea 
+                    id="love-content" 
+                    placeholder="把想对TA说的话写下来吧～" 
+                    rows="4" 
+                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-love/50 focus:border-love transition-all resize-none"
+                    required
+                ></textarea>
+                <button id="love-submit" class="mt-4 w-full py-3 btn-gradient-love flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i> 发布心动表白
+                </button>
+            </div>
+
+            <!-- 表白内容展示区域 -->
+            <div class="relative">
+                <div id="love-list" class="space-y-4 max-h-[550px] overflow-y-auto pr-2"></div>
+                <!-- 空状态提示 -->
+                <div id="love-empty" class="hidden flex-col items-center justify-center py-16 text-gray-400">
+                    <i class="fas fa-heart-broken text-5xl mb-4 text-love/30"></i>
+                    <p class="text-lg">还没有表白内容哦～</p>
+                    <p class="mt-2 text-sm">快来发布你的第一份心动吧！</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 相册模块 -->
+        <section class="bg-white rounded-2xl p-6 shadow-md overflow-hidden">
+            <!-- 模块标题栏 -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-album flex items-center">
+                    <i class="fas fa-photo-film mr-3 text-album-dark"></i>时光相册
+                </h2>
+                <span class="text-sm text-gray-500 bg-album-light px-3 py-1 rounded-full">
+                    已珍藏 <span id="album-count" class="font-semibold text-album-dark">0</span> 张照片
+                </span>
+            </div>
+
+            <!-- 图片上传区域 -->
+            <div class="mb-8">
+                <label for="image-upload" class="btn-gradient-album px-6 py-3 inline-block cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt mr-2"></i> 选择图片上传
+                </label>
+                <input type="file" id="image-upload" accept="image/*" class="hidden">
+                <p class="text-sm text-gray-500 mt-2">支持jpg、png、gif等格式，单张不超过10MB</p>
+            </div>
+
+            <!-- 相册展示区域 -->
+            <div class="relative">
+                <div id="album-list" class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[550px] overflow-y-auto"></div>
+                <!-- 空状态提示 -->
+                <div id="album-empty" class="hidden flex-col items-center justify-center py-16 text-gray-400">
+                    <i class="fas fa-images text-5xl mb-4 text-album/30"></i>
+                    <p class="text-lg">相册还是空的呢～</p>
+                    <p class="mt-2 text-sm">上传照片，珍藏美好时光！</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 px-4 text-center mt-10">
+        <div class="container mx-auto">
+            <p class="text-gray-300 mb-2">© 2025 心动表白墙 & 时光相册</p>
+            <p class="text-gray-400 text-sm">愿每一份心动都被回应，每一个瞬间都被珍藏</p>
+        </div>
+    </footer>
+
+    <!-- 引入前端交互逻辑 -->
+    <script src="./assets/js/script.js"></script>
+</body>
+</html>
